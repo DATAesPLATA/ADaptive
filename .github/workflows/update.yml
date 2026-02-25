@@ -1,0 +1,28 @@
+name: Actualizar Feed
+on:
+  schedule:
+    - cron: '*/10 * * * *' # Se ejecuta cada 10 minutos
+  workflow_dispatch: # Te permite ejecutarlo manualmente con un botón
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Descargar CSV de Google y convertir a JSON
+        run: |
+          # Reemplaza la URL de abajo por la que guardaste en el Paso 1
+          curl -L "https://docs.google.com/spreadsheets/d/e/2PACX-1vT7vhBaLzeHhMLW5sq-gWTey6CAi-7jBl_E_-usBkmhCrplCROSYQkmXsGShxdM6F2r4-mDEXaWkCzi/pub?gid=0&single=true&output=csv" -o feed.csv
+          
+          # Esta herramienta gratuita convierte el CSV a JSON automáticamente
+          npx csvtojson feed.csv > feed.json
+
+      - name: Guardar el JSON en GitHub
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add feed.json
+          git commit -m "Actualizar cuotas desde Google Sheets" || exit 0
+          git push
