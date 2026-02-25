@@ -1,2 +1,2 @@
-# feed-message-audiences
+# ADaptive
 Audience messages
